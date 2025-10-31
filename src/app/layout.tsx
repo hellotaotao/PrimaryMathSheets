@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "MathPDF Codex",
-  description:
-    "Curriculum-aligned maths worksheet generator with fine-grained difficulty controls.",
+  title: "Primary Math Worksheets",
+  description: "Auto-generated printable practice sets for primary students.",
 };
 
 export default function RootLayout({

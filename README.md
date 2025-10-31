@@ -1,6 +1,6 @@
-# MathPDF Codex
+# Primary Math Worksheets
 
-Curriculum-aligned worksheet builder for primary maths classrooms. Tune Australian year/term difficulty, mix arithmetic operations, constrain regrouping rules, and export polished PDFs with answer keys in one click.
+Auto-generated printable practice sets for primary maths classrooms. Tune Australian year/term difficulty, mix arithmetic operations, constrain regrouping rules, and export polished PDFs with answer keys in one click.
 
 ## Features
 

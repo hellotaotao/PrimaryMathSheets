@@ -233,11 +233,11 @@ export default function Home() {
               Curriculum-aligned maths practice
             </span>
             <h1 className="mt-4 text-3xl font-semibold text-slate-900 lg:text-4xl">
-              Tailor worksheets to every learner&apos;s next step
+              Primary Math Worksheets
             </h1>
             <p className="mt-3 max-w-xl text-base text-slate-600">
-              Select year level, topic focus and fine-grained constraints. We
-              generate printable worksheets and answer keys in PDF format.
+              Auto-generated printable practice sets with curriculum-aligned
+              difficulty controls, ready for PDF download.
             </p>
           </header>
 
