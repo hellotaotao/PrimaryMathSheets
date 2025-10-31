@@ -7,13 +7,14 @@ import {
   numberRangePresets,
 } from "@/lib/curriculum";
 import { generateWorksheet } from "@/lib/generator";
+import { WorksheetPreview } from "@/components/worksheet-preview";
 import type {
   GradeLevel,
   Operation,
   Term,
   WorksheetConfig,
-  WorksheetPayload,
   WorksheetFormat,
+  WorksheetPayload,
 } from "@/lib/types";
 
 const gradeOptions: { value: GradeLevel; label: string }[] = [
@@ -47,12 +48,43 @@ const formatOptions: { value: WorksheetFormat; label: string }[] = [
   { value: "multiple-choice", label: "Multiple choice" },
 ];
 
+const densityOptions = [
+  {
+    id: "spacious",
+    label: "宽松",
+    description: "3 列 × 8 行 · 24 题",
+    count: 24,
+    columns: 3,
+    rows: 8,
+  },
+  {
+    id: "standard",
+    label: "标准",
+    description: "4 列 × 9 行 · 36 题",
+    count: 36,
+    columns: 4,
+    rows: 9,
+  },
+  {
+    id: "compact",
+    label: "紧凑",
+    description: "5 列 × 10 行 · 50 题",
+    count: 50,
+    columns: 5,
+    rows: 10,
+  },
+];
+
 type StatusState = "idle" | "generating" | "error";
 
 export default function Home() {
   const [config, setConfig] = useState<WorksheetConfig>(() => defaultConfig());
-  const [preview, setPreview] = useState<WorksheetPayload>(() =>
-    generateWorksheet({ ...defaultConfig(), questionCount: 3 }, "preview"),
+  const [preview, setPreview] = useState<WorksheetPayload>(() => {
+    const initial = defaultConfig();
+    return generateWorksheet(initial, initial.seed);
+  });
+  const [previewMode, setPreviewMode] = useState<"worksheet" | "answers">(
+    "worksheet",
   );
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [status, setStatus] = useState<StatusState>("idle");
@@ -67,16 +99,20 @@ export default function Home() {
   }, [downloadUrl]);
 
   useEffect(() => {
-    const nextPreview = generateWorksheet(
-      { ...config, questionCount: Math.min(3, config.questionCount) },
-      `${config.seed}-preview`,
-    );
+    const nextPreview = generateWorksheet(config, config.seed);
     setPreview(nextPreview);
   }, [config]);
 
   const numberPresets = useMemo(
     () => numberRangePresets(config.grade),
     [config.grade],
+  );
+
+  const activeDensity = useMemo(
+    () =>
+      densityOptions.find((option) => option.count === config.questionCount) ??
+      densityOptions[1],
+    [config.questionCount],
   );
 
   const handleGradeChange = (grade: GradeLevel) => {
@@ -151,6 +187,7 @@ export default function Home() {
     setConfig(requestConfig);
     setStatus("generating");
     setError(null);
+    setPreviewMode("worksheet");
 
     try {
       const response = await fetch("/api/worksheet", {
@@ -189,8 +226,8 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-slate-100 py-12">
-      <main className="mx-auto flex max-w-6xl flex-col gap-10 px-6 lg:flex-row">
-        <section className="flex-1 rounded-3xl bg-white p-8 shadow-xl shadow-slate-200/70">
+      <main className="mx-auto flex w-full max-w-[1500px] flex-col gap-10 px-6 lg:grid lg:grid-cols-[minmax(320px,400px)_minmax(0,1fr)] lg:gap-12 xl:max-w-[1700px]">
+        <section className="rounded-3xl bg-white p-8 shadow-xl shadow-slate-200/70 lg:sticky lg:top-10 lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto">
           <header className="mb-8">
             <span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">
               Curriculum-aligned maths practice
@@ -336,29 +373,47 @@ export default function Home() {
                 ))}
               </div>
 
-              <label className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-slate-700">
-                  Question count
-                </span>
-                <input
-                  type="range"
-                  min={5}
-                  max={40}
-                  value={config.questionCount}
-                  onChange={(event) =>
-                    setConfig((previous) => ({
-                      ...previous,
-                      questionCount: Number.parseInt(event.target.value, 10),
-                    }))
-                  }
-                  className="accent-blue-600"
-                />
-                <div className="flex justify-between text-xs text-slate-500">
-                  <span>5</span>
-                  <span>{config.questionCount} questions</span>
-                  <span>40</span>
-                </div>
-              </label>
+            </div>
+          </div>
+
+          <div className="mt-8 space-y-4 rounded-2xl border border-slate-200 p-4">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+              题量布局
+            </h2>
+            <p className="text-sm text-slate-600">
+              以一页 A4 为标准，提供三种排版密度。可随时切换以匹配打印需求。
+            </p>
+            <div className="grid gap-3 md:grid-cols-3">
+              {densityOptions.map((option) => {
+                const active = option.count === config.questionCount;
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() =>
+                      setConfig((previous) => ({
+                        ...previous,
+                        questionCount: option.count,
+                      }))
+                    }
+                    className={`flex h-full flex-col justify-between rounded-2xl border px-4 py-4 text-left transition ${
+                      active
+                        ? "border-blue-500 bg-blue-50 text-blue-700 shadow-sm"
+                        : "border-slate-200 bg-white text-slate-600 hover:border-blue-200 hover:text-blue-700"
+                    }`}
+                  >
+                    <div>
+                      <p className="text-sm font-semibold">{option.label}</p>
+                      <p className="mt-2 text-xs text-slate-500">
+                        {option.description}
+                      </p>
+                    </div>
+                    <span className="mt-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                      共 {option.count} 题
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -501,7 +556,8 @@ export default function Home() {
               </p>
               <p className="mt-1">
                 Numbers between {config.minOperand} and {config.maxOperand},{" "}
-                {config.operandsPerQuestion} operands per question.
+                {config.operandsPerQuestion} operands per question, 当前为{" "}
+                {activeDensity.description}.
               </p>
             </div>
           </div>
@@ -540,51 +596,51 @@ export default function Home() {
           ) : null}
         </section>
 
-        <aside className="flex-1 space-y-6 rounded-3xl bg-white p-8 shadow-xl shadow-slate-200/70">
-          <header>
-            <h2 className="text-2xl font-semibold text-slate-900">
-              Live preview
-            </h2>
-            <p className="mt-2 text-sm text-slate-600">
-              We display three representative questions using the current
-              configuration. The exported PDF includes the complete set and an
-              answer key.
-            </p>
-          </header>
+        <aside className="space-y-6 rounded-3xl bg-white p-8 shadow-xl shadow-slate-200/70 lg:min-h-[720px] lg:overflow-hidden xl:p-10">
+          <div className="flex flex-col gap-4">
+            <header>
+              <h2 className="text-2xl font-semibold text-slate-900">
+                Live preview
+              </h2>
+              <p className="mt-2 text-sm text-slate-600">
+                The preview mirrors the PDF layout. Switch between the worksheet
+                page and the generated answer key.
+              </p>
+            </header>
 
-          <div className="flex flex-col gap-6">
-            {preview.questions.map((question, index) => (
-              <div
-                key={`${question.id}-${index}`}
-                className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+            <div className="inline-flex self-start rounded-full border border-slate-200 bg-slate-100 p-1 text-sm font-medium text-slate-600">
+              <button
+                type="button"
+                onClick={() => setPreviewMode("worksheet")}
+                className={`rounded-full px-4 py-2 transition ${
+                  previewMode === "worksheet"
+                    ? "bg-white text-slate-900 shadow-sm"
+                    : "hover:text-slate-900"
+                }`}
               >
-                <div className="flex items-baseline justify-between gap-3">
-                  <span className="text-xs font-semibold uppercase tracking-wide text-blue-700">
-                    {question.operation.toUpperCase()}
-                  </span>
-                  <span className="text-xs text-slate-500">
-                    {question.format === "word"
-                      ? "Word problem"
-                      : `${question.format.replace("-", " ")} format`}
-                  </span>
-                </div>
-                <p className="mt-3 whitespace-pre-wrap text-lg font-medium text-slate-800">
-                  {question.prompt}
-                </p>
-              </div>
-            ))}
+                Worksheet
+              </button>
+              <button
+                type="button"
+                onClick={() => setPreviewMode("answers")}
+                className={`rounded-full px-4 py-2 transition ${
+                  previewMode === "answers"
+                    ? "bg-white text-slate-900 shadow-sm"
+                    : "hover:text-slate-900"
+                }`}
+              >
+                Answer key
+              </button>
+            </div>
           </div>
 
-          <footer className="rounded-2xl border border-blue-100 bg-blue-50 p-4 text-sm text-blue-800">
-            <p className="font-semibold">
-              Adaptive roadmap (optional future step)
-            </p>
-            <p className="mt-1">
-              Enable adaptive mode to nudge number ranges and constraints
-              according to learner accuracy. Save worksheets to Supabase for
-              revision history and spaced review.
-            </p>
-          </footer>
+          <WorksheetPreview
+            payload={preview}
+            mode={previewMode}
+            columns={activeDensity.columns}
+            densityLabel={activeDensity.label}
+            rows={activeDensity.rows}
+          />
         </aside>
       </main>
     </div>

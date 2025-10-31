@@ -257,7 +257,7 @@ const baseConfig: WorksheetConfig = {
   maxOperand: 50,
   operandsPerQuestion: 2,
   format: "horizontal",
-  questionCount: 20,
+  questionCount: 36,
   allowCarrying: true,
   allowBorrowing: true,
   includeWordProblems: false,
