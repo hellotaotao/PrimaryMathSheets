@@ -51,24 +51,24 @@ const formatOptions: { value: WorksheetFormat; label: string }[] = [
 const densityOptions = [
   {
     id: "spacious",
-    label: "宽松",
-    description: "3 列 × 8 行 · 24 题",
+    label: "Spacious",
+    description: "3 cols x 8 rows (24 qns)",
     count: 24,
     columns: 3,
     rows: 8,
   },
   {
     id: "standard",
-    label: "标准",
-    description: "4 列 × 9 行 · 36 题",
+    label: "Standard",
+    description: "4 cols x 9 rows (36 qns)",
     count: 36,
     columns: 4,
     rows: 9,
   },
   {
     id: "compact",
-    label: "紧凑",
-    description: "5 列 × 10 行 · 50 题",
+    label: "Compact",
+    description: "5 cols x 10 rows (50 qns)",
     count: 50,
     columns: 5,
     rows: 10,
@@ -226,7 +226,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-slate-100 py-12">
-      <main className="mx-auto flex w-full max-w-[1500px] flex-col gap-10 px-6 lg:grid lg:grid-cols-[minmax(320px,400px)_minmax(0,1fr)] lg:gap-12 xl:max-w-[1700px]">
+      <main className="mx-auto flex w-full max-w-[1500px] flex-col gap-10 px-6 lg:grid lg:grid-cols-[minmax(380px,460px)_minmax(0,1fr)] lg:gap-12 xl:max-w-[1700px]">
         <section className="rounded-3xl bg-white p-8 shadow-xl shadow-slate-200/70 lg:sticky lg:top-10 lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto">
           <header className="mb-8">
             <span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">
@@ -241,147 +241,149 @@ export default function Home() {
             </p>
           </header>
 
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="space-y-4 rounded-2xl border border-slate-200 p-4">
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
-                Core Settings
-              </h2>
-
-              <label className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-slate-700">
-                  Year Level
+          <div className="flex flex-col gap-6">
+            <div className="space-y-6 rounded-2xl border border-slate-200 p-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+                  Core Settings
+                </h2>
+                <span className="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-500">
+                  {config.minOperand} - {config.maxOperand}
                 </span>
-                <div className="grid grid-cols-2 gap-2">
-                  {gradeOptions.map((option) => (
-                    <button
-                      key={option.value}
-                      type="button"
-                      onClick={() => handleGradeChange(option.value)}
-                      className={`rounded-lg border px-3 py-2 text-sm font-medium transition ${
-                        config.grade === option.value
-                          ? "border-blue-500 bg-blue-50 text-blue-700"
-                          : "border-slate-200 bg-white text-slate-600 hover:border-blue-200 hover:text-blue-700"
-                      }`}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              </label>
+              </div>
 
-              <label className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-slate-700">Term</span>
-                <div className="grid grid-cols-2 gap-2">
-                  {termOptions.map((option) => (
-                    <button
-                      key={option.value}
-                      type="button"
-                      onClick={() => handleTermChange(option.value)}
-                      className={`rounded-lg border px-3 py-2 text-sm font-medium transition ${
-                        config.term === option.value
-                          ? "border-blue-500 bg-blue-50 text-blue-700"
-                          : "border-slate-200 bg-white text-slate-600 hover:border-blue-200 hover:text-blue-700"
-                      }`}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              </label>
-
-              <label className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-slate-700">
-                  Bundled Difficulty Mode
-                </span>
-                <button
-                  type="button"
-                  onClick={toggleDifficultyMode}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-left text-sm font-medium text-slate-600 transition hover:border-blue-200 hover:text-blue-700"
-                >
-                  Mode:{" "}
-                  <span className="font-semibold capitalize text-slate-900">
-                    {config.difficultyMode}
+              <div className="space-y-4">
+                <label className="flex flex-col gap-2">
+                  <span className="text-sm font-medium text-slate-700">
+                    Year Level
                   </span>
-                </button>
-              </label>
-            </div>
-
-            <div className="space-y-4 rounded-2xl border border-slate-200 p-4">
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
-                Number Range
-              </h2>
-
-              <div className="flex items-center justify-between text-xs uppercase text-slate-400">
-                <span>Min</span>
-                <span>Max</span>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <label className="flex flex-col gap-1 text-sm">
-                  <span className="text-slate-500">Minimum value</span>
-                  <input
-                    type="number"
-                    min={0}
-                    value={config.minOperand}
-                    onChange={(event) =>
-                      setConfig((previous) => ({
-                        ...previous,
-                        minOperand: Number.parseInt(event.target.value, 10),
-                      }))
-                    }
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
-                  />
+                  <div className="grid grid-cols-2 gap-2">
+                    {gradeOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => handleGradeChange(option.value)}
+                        className={`rounded-lg border px-3 py-2 text-sm font-medium transition ${
+                          config.grade === option.value
+                            ? "border-blue-500 bg-blue-50 text-blue-700"
+                            : "border-slate-200 bg-white text-slate-600 hover:border-blue-200 hover:text-blue-700"
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
                 </label>
 
-                <label className="flex flex-col gap-1 text-sm">
-                  <span className="text-slate-500">Maximum value</span>
-                  <input
-                    type="number"
-                    min={config.minOperand + 1}
-                    value={config.maxOperand}
-                    onChange={(event) =>
-                      setConfig((previous) => ({
-                        ...previous,
-                        maxOperand: Number.parseInt(event.target.value, 10),
-                      }))
-                    }
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
-                  />
+                <label className="flex flex-col gap-2">
+                  <span className="text-sm font-medium text-slate-700">Term</span>
+                  <div className="grid grid-cols-2 gap-2">
+                    {termOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => handleTermChange(option.value)}
+                        className={`rounded-lg border px-3 py-2 text-sm font-medium transition ${
+                          config.term === option.value
+                            ? "border-blue-500 bg-blue-50 text-blue-700"
+                            : "border-slate-200 bg-white text-slate-600 hover:border-blue-200 hover:text-blue-700"
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
                 </label>
-              </div>
 
-              <div className="flex flex-wrap gap-2">
-                {numberPresets.map((preset) => (
+                <label className="flex flex-col gap-2">
+                  <span className="text-sm font-medium text-slate-700">
+                    Bundled Difficulty Mode
+                  </span>
                   <button
-                    key={preset}
                     type="button"
-                    onClick={() =>
-                      setConfig((previous) => ({
-                        ...previous,
-                        minOperand: 0,
-                        maxOperand: preset,
-                      }))
-                    }
-                    className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
-                      config.maxOperand === preset && config.minOperand === 0
-                        ? "bg-blue-600 text-white"
-                        : "bg-slate-100 text-slate-600 hover:bg-blue-50 hover:text-blue-700"
-                    }`}
+                    onClick={toggleDifficultyMode}
+                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-left text-sm font-medium text-slate-600 transition hover:border-blue-200 hover:text-blue-700"
                   >
-                    0 – {preset}
+                    Mode:{" "}
+                    <span className="font-semibold capitalize text-slate-900">
+                      {config.difficultyMode}
+                    </span>
                   </button>
-                ))}
+                </label>
               </div>
 
+              <div className="space-y-4 border-t border-slate-200 pt-4">
+                <div className="flex items-center justify-between text-xs uppercase tracking-wide text-slate-400">
+                  <span>Number range</span>
+                  <span>{config.minOperand} - {config.maxOperand}</span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <label className="flex flex-col gap-1 text-sm">
+                    <span className="text-slate-500">Minimum value</span>
+                    <input
+                      type="number"
+                      min={0}
+                      value={config.minOperand}
+                      onChange={(event) =>
+                        setConfig((previous) => ({
+                          ...previous,
+                          minOperand: Number.parseInt(event.target.value, 10),
+                        }))
+                      }
+                      className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
+                    />
+                  </label>
+
+                  <label className="flex flex-col gap-1 text-sm">
+                    <span className="text-slate-500">Maximum value</span>
+                    <input
+                      type="number"
+                      min={config.minOperand + 1}
+                      value={config.maxOperand}
+                      onChange={(event) =>
+                        setConfig((previous) => ({
+                          ...previous,
+                          maxOperand: Number.parseInt(event.target.value, 10),
+                        }))
+                      }
+                      className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
+                    />
+                  </label>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  {numberPresets.map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() =>
+                        setConfig((previous) => ({
+                          ...previous,
+                          minOperand: 0,
+                          maxOperand: preset,
+                        }))
+                      }
+                      className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
+                        config.maxOperand === preset && config.minOperand === 0
+                          ? "bg-blue-600 text-white"
+                          : "bg-slate-100 text-slate-600 hover:bg-blue-50 hover:text-blue-700"
+                      }`}
+                    >
+                      0 - {preset}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 
           <div className="mt-8 space-y-4 rounded-2xl border border-slate-200 p-4">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
-              题量布局
+              Worksheet Layout Density
             </h2>
             <p className="text-sm text-slate-600">
-              以一页 A4 为标准，提供三种排版密度。可随时切换以匹配打印需求。
+              Sized for a single A4 page. Pick a layout to suit how much practice you want on each sheet.
             </p>
             <div className="grid gap-3 md:grid-cols-3">
               {densityOptions.map((option) => {
@@ -408,9 +410,6 @@ export default function Home() {
                         {option.description}
                       </p>
                     </div>
-                    <span className="mt-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
-                      共 {option.count} 题
-                    </span>
                   </button>
                 );
               })}
@@ -556,7 +555,7 @@ export default function Home() {
               </p>
               <p className="mt-1">
                 Numbers between {config.minOperand} and {config.maxOperand},{" "}
-                {config.operandsPerQuestion} operands per question, 当前为{" "}
+                {config.operandsPerQuestion} operands per question, currently{" "}
                 {activeDensity.description}.
               </p>
             </div>

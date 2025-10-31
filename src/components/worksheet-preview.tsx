@@ -43,12 +43,8 @@ export function WorksheetPreview({
   densityLabel,
   rows,
 }: WorksheetPreviewProps) {
-  const subtitle = `Grade ${payload.config.grade.toUpperCase()} · Term ${
-    payload.config.term
-  }`;
-  const badge = `${densityLabel ?? payload.config.format.replace("-", " ")} · ${
-    payload.questions.length
-  }`;
+  const subtitle = `Grade ${payload.config.grade.toUpperCase()} - Term ${payload.config.term}`;
+  const badge = `${densityLabel ?? payload.config.format.replace("-", " ")} (${payload.questions.length})`;
 
   const columnCount = Math.max(
     1,
@@ -112,7 +108,7 @@ export function WorksheetPreview({
                             key={`blank-${columnIndex}-${fillerIndex}`}
                             className="flex items-baseline gap-2 whitespace-pre text-left leading-tight text-slate-300"
                           >
-                            <span className="text-xs font-semibold">•</span>
+                            <span className="text-xs font-semibold">-</span>
                             <span className="flex-1 border-b border-dashed border-slate-300" />
                           </li>
                         ),
